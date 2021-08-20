@@ -8,8 +8,6 @@ Docker is an open platform that is used for running applications and packaging t
 
 **VMs** tools are easier to access and simpler to work with whereas Docker has a more complicated ecosystem that conists of docker-managed and third-party tools.
 
-<hr>
-
 **Paypal uses Docker** to drive a "cost efficiency and enterprise-grade-security" for its infrastructure. Docker has helped reduce the numbers of VMs it needs to run.
 
 **Application development**: Docker is primarily used to package an application’s code and its dependencies. The same container can be shared from Dev to QA and later to IT, thus bringing portability to the development pipeline.
@@ -130,3 +128,38 @@ COPY . .
 EXPOSE 5000
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0" ]
 ```
+
+```Docker
+FROM node AS app
+WORKDIR /usr/src/app
+COPY ["package.json", "package-lock.json*", "./"]
+COPY . .
+RUN npm install -g npm@7.20.6 
+RUN npm install express
+#RUN node seeds/seed.js
+
+CMD ["node", "app.js"]
+```
+### DOCKER COMPOSE
+```YML
+version: '3.8'
+
+services:
+  # start the db image and map to port 27017
+  db:
+    build: ./db
+    restart: always
+    ports: [27017:27017]
+
+  web:
+    # start up the web app image and map to localhost
+    build: ./app
+    restart: always
+    ports: [80:3000]
+    # set variable for db port
+    environment:
+      - DB_HOST=mongodb://db:27017/posts
+    # links the two images 
+    depends_on:
+      - db
+ ```
